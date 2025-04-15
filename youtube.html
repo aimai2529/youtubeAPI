@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+</head>
+
+<body>
+    <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
+    <!-- 1. ここの<div>タグがYoutubeの<iframe>に置き換わる。 -->
+    <div id="player"></div>
+
+    <!-- 動画が表示されている<div>の下に追加 -->
+    <nav>
+        <ul>
+            <li id="doplay">再生</li>
+            <li id="dopause">一時停止</li>
+            <li id="mute">ミュート</li>
+            <li id="do10sNext">10秒先へ</li>
+            <li id="do10sPrev">10秒戻る</li>
+            <li>
+                <select id="MovieId" class="ytMovie" name="ytMovie">
+                    <option selected value="wgorNrImnig">アンパンマン・キャラクターソング・メドレー【大阪桐蔭吹奏楽部】</option>
+                    <option value="huPYyGpehfY">アンパンマンのマーチ</option>
+                    <option value="gLFqJ1AEiLc">いくぞ！ばいきんまん</option>
+                    <option value="PH-8v_y275s">私はドキンちゃん</option>
+                    <option value="jDMVSJ55-FA">おなじみしょくぱんまん</option>
+                    <option value="FIHQzpQlbuI">とべ！カレーパンマン</option>
+                    <option value="6PBFmIME-U0">パンナのパンチ</option>
+                </select>
+            </li>
+
+            <li>
+                <form id="doSpeed">
+                    <input type="radio" id="mslow" name="speed" value="0.25" />
+                    <label for="mslow">0.25</label>
+                    <input type="radio" id="slow" name="speed" value="0.5" />
+                    <label for="slow">0.5</label>
+                    <input type="radio" id="normal" name="speed" value="1.0" checked />
+                    <label for="normal">1</label>
+                    <input type="radio" id="hspeed" name="speed" value="1.5" />
+                    <label for="hspeed">1.5</label>
+                    <input type="radio" id="mhspeed" name="speed" value="2" />
+                    <label for="mhspeed">2</label>
+                </form>
+            </li>
+        </ul>
+        <label>ボリューム<input type="range" min="0" max="100" name="volume" id="volume" value="50" />
+            <span id="volumeNum"></span>
+        </label>
+
+    </nav>
+
+
+    <script>
+        const dopauseBtn = document.querySelector('#dopause');
+        const doplayBtn = document.querySelector('#doplay');
+        const onMuteBtn = document.querySelector('#mute');
+        const onePrevBtn = document.querySelector('#do10sPrev');
+        const oneNextBtn = document.querySelector('#do10sNext');
+        const volumeBtn = document.querySelector('#volume');
+        const volumeTxt = document.querySelector('#volumeNum');
+        const movieid = document.querySelector('#MovieId');
+        const speedBtn = document.querySelector('#doSpeed');
+
+        // 2. 変数tagにscriptタグを作って入れる。Element=要素、Attrubute=属性
+        let tag = document.createElement('script');
+        tag.src = 'https://www.youtube.com/iframe_api';
+        let firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        // 3. APIのコードを読み込んでから、この関数を<iframe>内に影響させる。
+        let player;
+        let youtubeId = 'wgorNrImnig';
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                height: '360',
+                width: '640',
+                videoId: youtubeId,
+                playerVars: {
+                    playsinline: 1,
+                    controls: 0
+                },
+                events: {
+                    // onReady: onPlayerReady,
+                    // onStateChange: onPlayerStateChange
+                }
+            });
+        }
+
+        // 4. このAPIは、video playderが準備でしたら、この関数を呼び出します。
+        function onPlayerReady(event) {
+            event.target.playVideo(); //①最初の再生を止める
+            let currentVol = 5; //②最初のボリュームを設定（0〜100）
+            event.target.setVolume(currentVol); //③Playerのボリュームに設定
+            document.querySelector('#volume').value = currentVol; //④rangeFormに音量を設定
+            document.querySelector('#volumeNum').textContent = currentVol; //⑤テキストにも音量を数値で表示
+        }
+
+        /* 5. video playerのステート（状態）が変更されたら、この関数を呼び出す。
+        動画を再生するときの設定は、state=1にしておきます。
+        プレイヤーは、6000ミリ秒後に終了します。 */
+        let done = false;
+        function onPlayerStateChange(event) {
+            if (event.data == YT.PlayerState.PLAYING && !done) {
+                setTimeout(stopVideo, 6000);
+                done = true;
+            }
+        }
+        //停止関数
+        function stopVideo() {
+            player.stopVideo();
+        }
+
+        //再生関数
+        function playTheVideo() {
+            player.playVideo();
+        }
+
+        //一時停止関数
+        function pauseTheVideo() {
+            player.pauseVideo();
+        }
+
+        // 10秒前にの関数
+        function onePrev() {
+            let currentTime = player.getCurrentTime();
+            player.seekTo(currentTime - 10);
+        }
+
+        //10秒後にの関数
+        function oneNext() {
+            let currentTime = player.getCurrentTime();
+            player.seekTo(currentTime + 10);
+        }
+
+        //ミュート関数
+        function onMute() {
+            //ミュートの時、trueを返すのでミュートを解除します。
+            if (player.isMuted()) {
+                player.unMute();
+            } else {
+                //ミュートが解除されている時はfalseなので、ミュートにします。
+                player.mute();
+            }
+        }
+
+        //ボリューム関数
+        function volumeFn(vol) {
+            let currentVol = player.getVolume();
+            player.setVolume(vol);
+        }
+
+        //再生スピード関数
+        function playSpeed(num) {
+            //setPlaybackRateが再生スピードをセットするメソッド
+            console.log(num);
+            player.setPlaybackRate(num);
+            player.playVideo();
+        }
+
+
+        //一時停止イベント
+        dopauseBtn.addEventListener('click', function () {
+            pauseTheVideo();
+        });
+
+        //再生イベント
+        doplayBtn.addEventListener('click', function () {
+            playTheVideo(); //関数名に変更
+        });
+
+        //ミュートイベント
+        onMuteBtn.addEventListener('click', function () {
+            onMute();
+            if (player.isMuted()) {
+                onMuteBtn.innerText = 'ミュート'
+            } else {
+                onMuteBtn.innerText = 'ミュート解除'
+            }
+        });
+
+        //10秒前へイベント
+        onePrevBtn.addEventListener('click', function () {
+            onePrev();
+        });
+
+        //10秒後へイベント
+        oneNextBtn.addEventListener('click', function () {
+            oneNext();
+        });
+
+        //ボリュームイベント
+        volumeBtn.addEventListener('change', function () {
+            volumeFn(this.value);
+            volumeTxt.textContent = this.value;
+        });
+
+        //動画切り替えイベント
+        movieid.addEventListener('change', function () {
+            youtubeId = movieid.value;
+            //プレイヤー削除
+            player.destroy();
+            onYouTubeIframeAPIReady();
+        });
+
+        //再生スピードイベント
+        speedBtn.addEventListener('change', function () {
+            //数値でないと効かないので、文字列から数値に変換
+            playSpeed(parseFloat(speedBtn.speed.value));
+        });
+
+    </script>
+</body>
+
+</html>
