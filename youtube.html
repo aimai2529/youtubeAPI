@@ -9,10 +9,17 @@
             text-align: center;
             background-color: rgb(31, 31, 31);
             color: #fff;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         nav {
             margin-right: 30px;
+        }
+
+        .random {
+            margin-left: 30px;
         }
 
         li {
@@ -28,7 +35,7 @@
 
         .controles {
             display: flex;
-            justify-content: center;
+            justify-content: space-around;
         }
 
         .playControle {
@@ -81,7 +88,7 @@
                         <option value="6PBFmIME-U0">パンナのパンチ</option>
                     </select>
                 </li>
-                <li>
+                <!-- <li>
                     <form id="doSpeed">
                         <input type="radio" id="mslow" name="speed" value="0.25" />
                         <label for="mslow">0.25</label>
@@ -94,15 +101,15 @@
                         <input type="radio" id="mhspeed" name="speed" value="2" />
                         <label for="mhspeed">2</label>
                     </form>
-                </li>
+                </li> -->
             </ul>
             <label>ボリューム<input type="range" min="0" max="100" name="volume" id="volume" value="50" />
                 <span id="volumeNum"></span>
             </label>
         </nav>
 
-        <div>
-            <h1>気分に合わせて動画を楽しもう！</h1>
+        <div class="random">
+            <h1>気分に合わせて吹奏楽を楽しもう！</h1>
 
             <div>
                 <h2>🎲 おまかせ再生（ランダム速度）</h2>
@@ -112,7 +119,7 @@
             <div>
                 <h2>🎭 気分で選ぶ！</h2>
                 <button onclick="playMood('happy')">元気が出る！</button>
-                <button onclick="playMood('sad')">切ない…</button>
+                <button onclick="playMood('emo')">エモい…</button>
                 <button onclick="playMood('focus')">集中したい</button>
             </div>
         </div>
@@ -153,7 +160,7 @@
                 },
                 events: {
                     onReady: onPlayerReady,
-                    // onStateChange: onPlayerStateChange
+                    onStateChange: onPlayerStateChange
                 }
             });
         }
@@ -172,9 +179,15 @@
         プレイヤーは、6000ミリ秒後に終了します。 */
         let done = false;
         function onPlayerStateChange(event) {
-            if (event.data == YT.PlayerState.PLAYING && !done) {
-                setTimeout(stopVideo, 6000);
-                done = true;
+            if (event.data == YT.PlayerState.PLAYING) {
+                doplayImg.src = './Pause.png';
+                doplayBtn.classList.add('isPlay');
+            } else if (
+                event.data == YT.PlayerState.PAUSED ||
+                event.data == YT.PlayerState.ENDED
+            ) {
+                doplayImg.src = './Play.png';
+                doplayBtn.classList.remove('isPlay');
             }
         }
         //停止関数
@@ -278,10 +291,10 @@
         });
 
         //再生スピードイベント
-        speedBtn.addEventListener('change', function () {
-            //数値でないと効かないので、文字列から数値に変換
-            playSpeed(parseFloat(speedBtn.speed.value));
-        });
+        // speedBtn.addEventListener('change', function () {
+        //     //数値でないと効かないので、文字列から数値に変換
+        //     playSpeed(parseFloat(speedBtn.speed.value));
+        // });
 
         //検索する関数の定義
         function ytSearch(val) {
@@ -337,6 +350,37 @@
             alert(`今回のスピード：${speed}倍！`);
             playTheVideo();
         }
+
+        // 気分ごとの動画一覧
+        const moodVideos = {
+            happy: [
+                '6Jc5S3MPsh4', // テトリス
+                'C99haGfZEWg', // ジャンボリミッキー！
+                'fidpI8OkL0I'  // dubidubidu
+            ],
+            emo: [
+                '-Hpbtv17egk', // 僕らまた
+                'P7NZKixYKMg', // ファタール
+                'ulAmW1euyUY'  // 第九 Brass Rock
+            ],
+            focus: [
+                '5UnjbM4_wPA', // ステップ、スキップ、ノンストップ
+                '9VzSQVq_fmU', // マーチ　メモリーズリフレイン
+                'h53Z4ZzPcu0'  // 祝い唄と踊り唄による幻想曲
+            ]
+        };
+
+        // 動画切り替え
+        function playMood(mood) {
+            const list = moodVideos[mood];
+            if (!list) return;
+            const randomId = list[Math.floor(Math.random() * list.length)];
+            youtubeId = randomId;
+            player.destroy(); //プレイヤー削除
+            onYouTubeIframeAPIReady();
+            volumeFn(volumeBtn.value); // 音量再設定
+        }
+
 
     </script>
 </body>
