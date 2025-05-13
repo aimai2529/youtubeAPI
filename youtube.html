@@ -5,21 +5,51 @@
     <meta charset="UTF-8">
     <style>
         body {
+            margin-top: 60px;
             text-align: center;
             background-color: rgb(31, 31, 31);
             color: #fff;
         }
 
+        nav {
+            margin-right: 30px;
+        }
+
         li {
             list-style: none;
             padding-left: 0;
+            margin-bottom: 20px;
+        }
+
+        .searchlist {
+            display: block;
+            margin: 30px auto;
+        }
+
+        .controles {
+            display: flex;
+            justify-content: center;
+        }
+
+        .playControle {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 24px;
+        }
+
+        h2 {
+            font-size: 18px;
         }
     </style>
 </head>
 
 <body>
     <form>
-        <input type="search" id="ytSearch" value="TRiDENT" />
+        <input type="search" id="ytSearch" value="大阪桐蔭吹奏楽部" />
         <button id="searchBtn">検索</button>
     </form>
     <select class="searchlist">
@@ -29,47 +59,64 @@
     <!-- 1. ここの<div>タグがYoutubeの<iframe>に置き換わる。 -->
     <div id="player"></div>
 
-    <!-- 動画が表示されている<div>の下に追加 -->
-    <nav>
-        <ul>
-            <li id="doplay"><img src="./Play.png" alt="" class="playImg"></li>
-            <li id="mute">ミュート</li>
-            <li id="do10sNext">10秒先へ</li>
-            <li id="do10sPrev">10秒戻る</li>
-            <li>
-                <select id="MovieId" class="ytMovie" name="ytMovie">
-                    <option selected value="">おすすめ動画</option>
-                    <option value="wgorNrImnig">アンパンマン・キャラクターソング・メドレー【大阪桐蔭吹奏楽部】</option>
-                    <option value="huPYyGpehfY">アンパンマンのマーチ</option>
-                    <option value="gLFqJ1AEiLc">いくぞ！ばいきんまん</option>
-                    <option value="PH-8v_y275s">私はドキンちゃん</option>
-                    <option value="jDMVSJ55-FA">おなじみしょくぱんまん</option>
-                    <option value="FIHQzpQlbuI">とべ！カレーパンマン</option>
-                    <option value="6PBFmIME-U0">パンナのパンチ</option>
-                </select>
-            </li>
+    <div class="controles">
+        <!-- 動画が表示されている<div>の下に追加 -->
+        <nav>
+            <ul>
+                <div class="playControle">
+                    <li id="do10sPrev">10秒戻る</li>
+                    <li id="doplay"><img src="./Play.png" alt="" class="playImg"></li>
+                    <li id="do10sNext">10秒先へ</li>
+                </div>
+                <li id="mute">ミュート</li>
+                <li>
+                    <select id="MovieId" class="ytMovie" name="ytMovie">
+                        <option selected value="">おすすめ動画</option>
+                        <option value="wgorNrImnig">アンパンマン・キャラクターソング・メドレー【大阪桐蔭吹奏楽部】</option>
+                        <option value="huPYyGpehfY">アンパンマンのマーチ</option>
+                        <option value="gLFqJ1AEiLc">いくぞ！ばいきんまん</option>
+                        <option value="PH-8v_y275s">私はドキンちゃん</option>
+                        <option value="jDMVSJ55-FA">おなじみしょくぱんまん</option>
+                        <option value="FIHQzpQlbuI">とべ！カレーパンマン</option>
+                        <option value="6PBFmIME-U0">パンナのパンチ</option>
+                    </select>
+                </li>
+                <li>
+                    <form id="doSpeed">
+                        <input type="radio" id="mslow" name="speed" value="0.25" />
+                        <label for="mslow">0.25</label>
+                        <input type="radio" id="slow" name="speed" value="0.5" />
+                        <label for="slow">0.5</label>
+                        <input type="radio" id="normal" name="speed" value="1.0" checked />
+                        <label for="normal">1</label>
+                        <input type="radio" id="hspeed" name="speed" value="1.5" />
+                        <label for="hspeed">1.5</label>
+                        <input type="radio" id="mhspeed" name="speed" value="2" />
+                        <label for="mhspeed">2</label>
+                    </form>
+                </li>
+            </ul>
+            <label>ボリューム<input type="range" min="0" max="100" name="volume" id="volume" value="50" />
+                <span id="volumeNum"></span>
+            </label>
+        </nav>
 
-            <li>
-                <form id="doSpeed">
-                    <input type="radio" id="mslow" name="speed" value="0.25" />
-                    <label for="mslow">0.25</label>
-                    <input type="radio" id="slow" name="speed" value="0.5" />
-                    <label for="slow">0.5</label>
-                    <input type="radio" id="normal" name="speed" value="1.0" checked />
-                    <label for="normal">1</label>
-                    <input type="radio" id="hspeed" name="speed" value="1.5" />
-                    <label for="hspeed">1.5</label>
-                    <input type="radio" id="mhspeed" name="speed" value="2" />
-                    <label for="mhspeed">2</label>
-                </form>
-            </li>
-        </ul>
-        <label>ボリューム<input type="range" min="0" max="100" name="volume" id="volume" value="50" />
-            <span id="volumeNum"></span>
-        </label>
+        <div>
+            <h1>気分に合わせて動画を楽しもう！</h1>
 
-    </nav>
+            <div>
+                <h2>🎲 おまかせ再生（ランダム速度）</h2>
+                <button onclick="setRandomSpeed()">おまかせ再生！</button>
+            </div>
 
+            <div>
+                <h2>🎭 気分で選ぶ！</h2>
+                <button onclick="playMood('happy')">元気が出る！</button>
+                <button onclick="playMood('sad')">切ない…</button>
+                <button onclick="playMood('focus')">集中したい</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         const ytSearchBtn = document.querySelector('#searchBtn');
@@ -102,10 +149,10 @@
                 videoId: youtubeId,
                 playerVars: {
                     playsinline: 1,
-                    controls: 1
+                    controls: 0
                 },
                 events: {
-                    // onReady: onPlayerReady,
+                    onReady: onPlayerReady,
                     // onStateChange: onPlayerStateChange
                 }
             });
@@ -113,8 +160,8 @@
 
         // 4. このAPIは、video playderが準備でしたら、この関数を呼び出します。
         function onPlayerReady(event) {
-            event.target.playVideo(); //①最初の再生を止める
-            let currentVol = 5; //②最初のボリュームを設定（0〜100）
+            event.target.stopVideo(); //①最初の再生を止める
+            let currentVol = 20; //②最初のボリュームを設定（0〜100）
             event.target.setVolume(currentVol); //③Playerのボリュームに設定
             document.querySelector('#volume').value = currentVol; //④rangeFormに音量を設定
             document.querySelector('#volumeNum').textContent = currentVol; //⑤テキストにも音量を数値で表示
@@ -182,7 +229,6 @@
             player.playVideo();
         }
 
-
         //再生イベント
         doplayBtn.addEventListener('click', function () {
             if (doplayBtn.classList.contains('isPlay') == false) {
@@ -228,6 +274,7 @@
             //プレイヤー削除
             player.destroy();
             onYouTubeIframeAPIReady();
+            volumeFn(volumeBtn.value);
         });
 
         //再生スピードイベント
@@ -266,19 +313,30 @@
 
         //検索ボタンのクリック操作
         ytSearchBtn.addEventListener('click', function (e) {
-            const ytSearchVal = document.querySelector('#ytSearch').value;
-            console.log(ytSearchVal); //検索フォームの値を取得
-            ytSearch(ytSearchVal);
-
             e.preventDefault(); //検索ボタンの送信をストップしておく。
+
+            const ytSearchVal = document.querySelector('#ytSearch').value;//検索フォームの値を取得
+            ytSearch(ytSearchVal);
         });
 
         selectvideo.addEventListener('change', function () {
-            youtubeId = selectvideo.value;
-            //プレイヤー削除
-            player.destroy();
-            onYouTubeIframeAPIReady();
+            const selectedId = selectvideo.value;
+            if (selectedId) {
+                youtubeId = selectedId;
+                player.destroy(); //プレイヤー削除
+                onYouTubeIframeAPIReady();
+                volumeFn(volumeBtn.value); // 音量再設定
+            }
         });
+
+        // ランダム速度設定
+        function setRandomSpeed() {
+            if (!player) return;
+            const speed = (Math.random() * 1.75 + 0.25).toFixed(2); // 0.75～1.5
+            player.setPlaybackRate(parseFloat(speed));
+            alert(`今回のスピード：${speed}倍！`);
+            playTheVideo();
+        }
 
     </script>
 </body>
