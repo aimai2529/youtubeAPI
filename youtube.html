@@ -3,53 +3,166 @@
 
 <head>
     <meta charset="UTF-8">
+    <title>あなたの気分と吹奏楽！</title>
     <style>
         body {
-            margin-top: 60px;
-            text-align: center;
-            background-color: rgb(31, 31, 31);
+            margin: 30px auto;
+            background-color: #1f1f1f;
             color: #fff;
+            font-family: sans-serif;
             max-width: 1000px;
+            padding: 20px;
+        }
+
+        form {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input[type="search"] {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+            width: 300px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #7e00cc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #mute,
+        #do10sPrev,
+        #do10sNext,
+        #repeatToggle {
+            padding: 5px 10px;
+            font-size: 16px;
+            background-color: #1f1f1f;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        #mute,
+        #repeatToggle {
+            width: fit-content;
             margin-left: auto;
             margin-right: auto;
         }
 
-        nav {
-            margin-right: 30px;
-        }
 
-        .random {
-            margin-left: 30px;
-        }
-
-        li {
-            list-style: none;
-            padding-left: 0;
-            margin-bottom: 20px;
+        button:hover {
+            background-color: #a30082;
         }
 
         .searchlist {
             display: block;
+            margin: 20px auto;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+
+        #player {
             margin: 30px auto;
+            display: flex;
+            justify-content: center;
         }
 
         .controles {
             display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
             justify-content: space-around;
+            margin-top: 30px;
+        }
+
+        nav {
+            flex: 1 1 300px;
+            background-color: #2c2c2c;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        nav ul {
+            padding: 0;
+            margin: 0;
+        }
+
+        nav li {
+            list-style: none;
+            margin-bottom: 20px;
+            font-size: 16px;
+            cursor: pointer;
         }
 
         .playControle {
             display: flex;
-            justify-content: space-around;
+            justify-content: center;
             align-items: center;
+            gap: 40px;
+            margin-bottom: 15px;
         }
 
-        h1 {
+        .playControle li {
+            margin-bottom: 0;
+        }
+
+        .playImg {
+            width: 40px;
+            height: auto;
+            cursor: pointer;
+        }
+
+        label {
+            display: block;
+            margin-top: 30px;
+            font-size: 14px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        #volumeNum {
+            display: block;
+            width: fit-content;
             font-size: 24px;
+            margin: 10px auto 0;
+            padding: 10px;
+            background-color: #1f1f1f;
+            border-radius: 100%;
         }
 
-        h2 {
+        .random {
+            flex: 1 1 300px;
+            background-color: #2c2c2c;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .random h1 {
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+
+        .random h2 {
             font-size: 18px;
+            margin: 15px 0 10px;
+        }
+
+        .random button {
+            margin: 5px;
         }
     </style>
 </head>
@@ -76,6 +189,7 @@
                     <li id="do10sNext">10秒先へ</li>
                 </div>
                 <li id="mute">ミュート</li>
+                <li id="repeatToggle">リピート：OFF</li>
                 <li>
                     <select id="MovieId" class="ytMovie" name="ytMovie">
                         <option selected value="">おすすめ動画</option>
@@ -104,6 +218,9 @@
                 </li> -->
             </ul>
             <label>ボリューム<input type="range" min="0" max="100" name="volume" id="volume" value="50" />
+                <div style="display: flex; justify-content: space-between; width: 100%;">
+                    <span>0</span><span>50</span><span>100</span>
+                </div>
                 <span id="volumeNum"></span>
             </label>
         </nav>
@@ -112,12 +229,14 @@
             <h1>気分に合わせて吹奏楽を楽しもう！</h1>
 
             <div>
-                <h2>🎲 おまかせ再生（ランダム速度）</h2>
-                <button onclick="setRandomSpeed()">おまかせ再生！</button>
+                <h2>🎲 ランダムな速度で再生！</h2>
+                <p>現在の速度：<span class="setSpeed">1</span>倍</p>
+                <button onclick="setRandomSpeed()">ランダムな速度に</button>
+                <button onclick="setNormalSpeed()">通常速度に</button>
             </div>
 
             <div>
-                <h2>🎭 気分で選ぶ！</h2>
+                <h2>☺️ 気分で選ぶ！</h2>
                 <button onclick="playMood('happy')">元気が出る！</button>
                 <button onclick="playMood('emo')">エモい…</button>
                 <button onclick="playMood('focus')">集中したい</button>
@@ -138,6 +257,9 @@
         const movieid = document.querySelector('#MovieId');
         const speedBtn = document.querySelector('#doSpeed');
         const selectvideo = document.querySelector(".searchlist");
+        const setSpeed = document.querySelector('.setSpeed');
+        const repeatBtn = document.querySelector('#repeatToggle');
+
 
 
         // 2. 変数tagにscriptタグを作って入れる。Element=要素、Attrubute=属性
@@ -188,6 +310,12 @@
             ) {
                 doplayImg.src = './Play.png';
                 doplayBtn.classList.remove('isPlay');
+            }
+
+            // リピート処理
+            if (event.data == YT.PlayerState.ENDED && isRepeat) {
+                player.seekTo(0); // 冒頭に巻き戻し
+                player.playVideo(); // 再生再開
             }
         }
         //停止関数
@@ -290,6 +418,15 @@
             volumeFn(volumeBtn.value);
         });
 
+        // リピートイベント
+        let isRepeat = false; // 初期状態：リピートOFF
+
+        // リピートボタンの切り替え機能
+        repeatBtn.addEventListener('click', () => {
+            isRepeat = !isRepeat;
+            repeatBtn.textContent = `リピート：${isRepeat ? 'ON' : 'OFF'}`;
+        });
+
         //再生スピードイベント
         // speedBtn.addEventListener('change', function () {
         //     //数値でないと効かないので、文字列から数値に変換
@@ -299,7 +436,7 @@
         //検索する関数の定義
         function ytSearch(val) {
             const key = 'AIzaSyCDknA4iCZYkJp7VDazdcKpywETRbVwGHU'; //自分のキーに書き換えます。
-            const num = 10;
+            const num = 20;
             const part = 'snippet';
             const type = 'video';
             const query = val;
@@ -347,9 +484,19 @@
             if (!player) return;
             const speed = (Math.random() * 1.75 + 0.25).toFixed(2); // 0.75～1.5
             player.setPlaybackRate(parseFloat(speed));
-            alert(`今回のスピード：${speed}倍！`);
+            // alert(`今回のスピード：${speed}倍！`);
+            setSpeed.textContent = speed;
             playTheVideo();
         }
+
+        // 通常速度設定
+        function setNormalSpeed() {
+            if (!player) return;
+            player.setPlaybackRate(parseFloat(1));
+            setSpeed.textContent = "1";
+            playTheVideo();
+        }
+
 
         // 気分ごとの動画一覧
         const moodVideos = {
